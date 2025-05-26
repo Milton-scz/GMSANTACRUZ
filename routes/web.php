@@ -68,6 +68,7 @@ Route::get('/admin-certificados/firmarPdf/{certificado_id}', [CertificadoControl
 Route::get('/admin/certificados/verificacion', [CertificadoController::class, 'verificacion'])->name('admin.certificados.verificacion');
 Route::post('/admin/certificados/verificar', [CertificadoController::class, 'verificar'])->name('admin.certificado.verificacion.verificar');
 Route::get('admin/certificados/ver/{id}', [CertificadoController::class, 'showPdf'])->name('admin.certificados.ver');
+Route::post('/admin/verificar/datos/firmados', [CertificadoController::class, 'verificarDatosFirmados'])->name('admin.verificar.datos.firmados');
 
 //LANDING PAGE
 Route::get('/landing/tipos-licencias', function () {

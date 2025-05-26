@@ -35,7 +35,7 @@
             @foreach($certificados as $certificado)
 
                 <tr>
-                        <td style="text-align: center;">{{$certificado->id}}</td>
+                        <td style="text-align: center;">{{$certificado->solicitud->id}}</td>
                         <td style="text-align: center;">{{$certificado->solicitud->beneficiario->nombre}}</td>
                         <td style="text-align: center; font-weight: bold; color: {{ $certificado->signed ? '#1e6932' : '#c0392b' }};">
                             {{ $certificado->signed ? 'Firmado' : 'No firmado' }}
@@ -49,19 +49,19 @@
                         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
 
 
-                             <a href="{{ route('admin.certificados.descargar', $certificado->id) }}"
+                             <a href="{{ route('admin.certificados.descargar', $certificado->solicitud->id) }}"
                             class="btn-descargar-certificado"
                             target="_blank" rel="noopener noreferrer">
                                 📄 Imprmir Certificado
                             </a>
-                            <a href="{{ route('admin.certificados.ver', $certificado->id) }}"
+                            <a href="{{ route('admin.certificados.ver', $certificado->solicitud->id) }}"
                             target="_blank"
                             class="btn-descargar-certificado">
                             📄 Ver PDF Firmado
                             </a>
 
                             <button class="btn-firmar-certificado"
-                                    data-id="{{ $certificado->id }}">
+                                    data-id="{{ $certificado->solicitud->id }}">
                                 ✍️ Firmar
                             </button>
 

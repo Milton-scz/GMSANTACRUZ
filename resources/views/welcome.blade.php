@@ -272,6 +272,41 @@
 </div>
 
     </div>
+
+<!-- Modal Validar Licencia -->
+ @if(session('success'))
+    <!-- Modal Bootstrap -->
+    <div class="modal fade" id="modalSuccessLicencia" tabindex="-1" aria-labelledby="tramiteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="tramiteModalLabel">Código de Seguimiento</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="alert alert-success text-center fw-bold">
+                        {{ session('success') }}
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script para abrir el modal automáticamente -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const tramiteModal = new bootstrap.Modal(document.getElementById('modalSuccessLicencia'));
+            tramiteModal.show();
+        });
+    </script>
+@endif
+
+
+
+<script src="//unpkg.com/alpinejs" defer></script>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function submitCodigo() {

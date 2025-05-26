@@ -8,7 +8,8 @@
 <div class="max-w-4xl mx-auto mt-8 bg-white shadow-md rounded-lg p-6">
 
 
-        <form method="POST" action="{{ route('admin.solicitudes.store') }}">
+       <form method="POST" action="{{ route('admin.solicitudes.store') }}" enctype="multipart/form-data">
+
             @csrf
 
             <!-- Paso 1: Datos del solicitante -->
@@ -30,7 +31,7 @@
                             <span class="text-sm text-gray-700">Persona Jurídica</span>
                         </label>
                     </div>
-</div>
+            </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -63,10 +64,17 @@
                             class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
                     </div>
                 </div>
-
+                <div class="mb-4">
+                        <label for="cedula_anverso" class="block text-sm font-medium text-gray-700">Subir Cedula anverso</label>
+                        <input type="file" id="cedula_anverso" name="cedula_anverso" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="cedula_reverso" class="block text-sm font-medium text-gray-700">Subir Cedula reverso</label>
+                        <input type="file" id="cedula_reverso" name="cedula_reverso" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
                 <div class="text-center mt-6">
                     <button type="button" id="next"
-                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded">
+                        class="bg-blue-500 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded">
                         Siguiente
                     </button>
                 </div>
@@ -108,6 +116,14 @@
                     <input type="hidden" id="lng" name="lng">
                 </div>
 
+                <div class="mb-4">
+                        <label for="file_nit" class="block text-sm font-medium text-gray-700">Subir NIT</label>
+                        <input type="file" id="file_nit" name="file_nit" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="file_luz" class="block text-sm font-medium text-gray-700">Subir Pre aviso de luz o Agua</label>
+                        <input type="file" id="file_luz" name="file_luz" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
                 </div>
 
 

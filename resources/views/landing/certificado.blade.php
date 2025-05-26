@@ -126,7 +126,7 @@
             <div class="fila"><span class="etiqueta">Razón Social:</span> {{ $data['nombre'] }}</div>
             <div class="fila"><span class="etiqueta">Propietario:</span> {{ $data['nombre'] }}</div>
             <div class="fila"><span class="etiqueta">NIT / CI:</span> {{ $data['nit'] }}</div>
-            <div class="fila"><span class="etiqueta">Actividad:</span> La actividad de servicios - Mediano Contribuyente</div>
+            <div class="fila"><span class="etiqueta">Actividad:</span> {{ $data['actividad'] }}</div>
             <div class="fila"><span class="etiqueta">Dirección:</span> Av. Los Ángeles C/ Tucanes Nro. 2020</div>
             <div class="fila"><span class="etiqueta">Superficie:</span> 50.00 mts. cuadrados</div>
             <div class="fila"><span class="etiqueta">Fecha de Inicio:</span> 10/06/2019</div>

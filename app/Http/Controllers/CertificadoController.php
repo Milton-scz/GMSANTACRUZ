@@ -12,6 +12,7 @@ use TCPDF;
 use Illuminate\Support\Facades\Log;
 class CertificadoController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -52,7 +53,8 @@ class CertificadoController extends Controller
      */
   public function showPdf($certificado_id)
 {
-    $certificado = Certificado::findOrFail($certificado_id);
+ $solicitud = Solicitud::findOrFail($certificado_id); // o el ID que te llegue por parámetro
+   $certificado = Certificado::where('solicitud_id', $solicitud->id)->first();
 
     $ruta = storage_path('app/public/certificados/' . basename($certificado->urlPdfSigned));
 
@@ -137,18 +139,94 @@ class CertificadoController extends Controller
 
 
 
+    public function verificarDatosFirmados(Request $request)
+{
+    $datos = $request->all();
+
+    // Ruta de la clave pública
+    $publicKeyPath = storage_path('app/certs/clave_publica.pem');
+    $publicKey = file_get_contents($publicKeyPath);
+
+
+    $data = [
+        'certificado_id' => $datos['Licencia N°'],
+        'razon_social' => $datos['Razón Social'],
+        'nit' => $datos['NIT / CI'],
+        'actividad' => $datos['Actividad']
+    ];
+
+/*   $data = [
+        'certificado_id' =>'11',
+        'razon_social' => 'milton gutierrez',
+        'nit' => '123456',
+        'actividad' => 'venta de comida',
+    ];
+*/
+    Log::info('Datos a verificar', ['data' => $data]);
+    try {
+
+        $certificado_id = $data['certificado_id'] ?? null;
+        if (!$certificado_id) {
+            return response()->json(['error' => 'Certificado ID no proporcionado.'], 400);
+        }
+
+        // Llamada a la API para obtener los datos firmados
+        $response = Http::get('http://localhost:3000/api/get-data-contract/' . $certificado_id);
+        if ($response->successful()) {
+            $responseData = json_decode($response->body(), true);
+
+            if (!isset($responseData['data'][0]) || !isset($responseData['data'][1])) {
+                return response()->json(['error' => 'Respuesta inválida del servidor.'], 500);
+            }
+
+            $firmaBase64 = $responseData['data'][1];  // La firma en base64
+
+            // Verificar la firma
+            $firmaBinaria = base64_decode($firmaBase64);
+            $verificado = openssl_verify(json_encode($data), $firmaBinaria, $publicKey, OPENSSL_ALGO_SHA256);
+
+            if ($verificado === 1) {
+                return response()->json([
+                    'status' => 'ok',
+                    'mensaje' => 'Firma verificada correctamente.'
+                ]);
+            } elseif ($verificado === 0) {
+                Log::error('Firma no válida.', ['firma' => $firmaBase64]);
+                return response()->json(['error' => 'Firma no válida.'], 400);
+            } else {
+                return response()->json(['error' => 'Error al verificar la firma: ' . openssl_error_string()], 500);
+            }
+
+        } else {
+            return response()->json(['error' => 'Error al obtener datos del servidor externo.'], 500);
+        }
+
+    } catch (\Exception $e) {
+        Log::error('Error al procesar la solicitud.', ['exception' => $e->getMessage()]);
+        return response()->json(['error' => 'Error al procesar la verificación.'], 500);
+    }
+}
+
+
+
+
+
+
 public function generarCertificado(Request $request)
 {
-    $certificado = Certificado::findOrFail($request->certificado_id);
+    $solicitud = Solicitud::findOrFail($request->certificado_id); // o el ID que te llegue por parámetro
+   $certificado = Certificado::where('solicitud_id', $solicitud->id)->first();
 
     $data = [
         'nombre' => $certificado->solicitud->beneficiario->nombre,
         'cedula' => $certificado->solicitud->beneficiario->cedula,
         'nit' => $certificado->solicitud->formulario->actividadEconomica->nit,
+        'actividad' => $certificado->solicitud->formulario->actividadEconomica->actividad_economica,
         'firma' => $certificado->firma,
         'id' => $certificado->id
     ];
 
+    Log::info('Datos del certificado', ['data' => $data]);
     return view('GestionarCertificados.certificados.certificado', compact('data'));
 }
 
@@ -160,29 +238,53 @@ public function generarCertificado(Request $request)
 
 public function firmarPdf($certificado_id)
 {
-    $certificado = Certificado::findOrFail($certificado_id);
+   $solicitud = Solicitud::findOrFail($certificado_id); // o el ID que te llegue por parámetro
+   $certificado = Certificado::where('solicitud_id', $solicitud->id)->first();
+    if (!$certificado) {
+        return response()->json(['error' => 'Certificado no encontrado.'], 404);
+    }
 
     $certificatePath = storage_path('app/certs/certificado.pem');
-    $privateKeyPath  = storage_path('app/certs/clave_privada-sin-pass.pem');
+    $privateKeyPath =storage_path('app/certs/clave_privada.pem');
+
 
     $privateKey = file_get_contents($privateKeyPath);
     $certificate = 'file://' . $certificatePath;
     $privateKeyFile = 'file://' . $privateKeyPath;
 
+
+
+
+
     // === DATOS A FIRMAR ===
     $data = [
-        'certificado_id' => $certificado->id,
-        'razon_social' => $certificado->solicitud->beneficiario->nombre,
-        'nit' => $certificado->solicitud->formulario->actividadEconomica->nit,
-        'actividad' => $certificado->solicitud->formulario->actividadEconomica->actividad_economica,
-        'fecha' => now()->toDateTimeString(),
+        'certificado_id' => (string) $certificado->id,
+        'razon_social' => (string)$certificado->solicitud->beneficiario->nombre,
+        'nit' => (string) $certificado->solicitud->formulario->actividadEconomica->nit,
+        'actividad' =>  (string)$certificado->solicitud->formulario->actividadEconomica->actividad_economica,
     ];
+Log::info('Datos a firmar', ['data' => $data]);
 
-    if (!openssl_sign(json_encode($data), $firmaBinaria, $privateKey, OPENSSL_ALGO_SHA256)) {
+     /*  $data = [
+        'certificado_id' =>'11',
+        'razon_social' => 'milton gutierrez',
+        'nit' => '123456',
+        'actividad' => 'venta de comida',
+        'fecha' => '2023-10-01',
+    ];
+    */
+
+    // === FIRMA DIGITAL ===
+
+    if ($privateKey === false) {
+        return response()->json(['error' => 'No se pudo obtener la clave privada.'], 500);
+    }
+
+    $signature = openssl_sign(json_encode($data), $sign, $privateKey, OPENSSL_ALGO_SHA256) ? base64_encode($sign) : null;
+    if ($signature === null) {
         return response()->json(['error' => 'No se pudo firmar los datos.'], 500);
     }
 
-    $firmaBase64 = base64_encode($firmaBinaria);
 
     // === LEE INFO DEL CERTIFICADO ===
     $certData = openssl_x509_parse(file_get_contents($certificatePath));
@@ -236,7 +338,7 @@ public function firmarPdf($certificado_id)
     $pdf->SetFont('helvetica', 'B', 9);
     $pdf->Cell(0, 6, ('Firmado Digitalmente por:'), 0, 1);
     $pdf->SetFont('helvetica', '', 9);
-    $pdf->MultiCell(0, 5, "$nombre\nFecha de firma: " . now()->format('d/m/Y H:i:s') . "\nFirma de datos:\n" . $firmaBase64);
+    $pdf->MultiCell(0, 5, "$nombre\nFecha de firma: " . now()->format('d/m/Y H:i:s') . "\nFirma de datos:\n" . $signature);
     $pdf->Ln(5);
 
     // === Firma del PDF ===
@@ -271,13 +373,13 @@ public function firmarPdf($certificado_id)
     // === GUARDAR EN BASE DE DATOS ===
     $certificado->urlPdfSigned = $url;
     $certificado->signed = 1;
-    $certificado->firma = $firmaBase64;
+    $certificado->firma = $signature;
     $certificado->save();
 
 
   $response = Http::post('http://localhost:3000/api/save-data', [
                 'codigoSolicitud' =>  (string) $certificado->id,
-                'datosFirmados' => $firmaBase64,
+                'datosFirmados' => $signature,
             ])->throw();
     // Maneja la respuesta
     if ($response->successful()) {

@@ -32,4 +32,10 @@ class Solicitud extends Model
 {
     return $this->belongsTo(Certificado::class);
 }
+
+public function files()
+{
+    return $this->belongsToMany(File::class);
+}
+
 }

@@ -122,8 +122,34 @@
             </div>`;
         }
         html += '</div>';
-
+// Agregar botón de verificación al final
+      html += `
+        <div class="mt-4">
+          <button id="verificarBtn" class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Verificar Modificaciones
+          </button>
+        </div>
+      `;
         resultado.innerHTML = html;
+
+        let datosExtraidos = {};
+        for (let i = 0; i < claves.length; i++) {
+            datos[claves[i]] = valores[i] || '';
+            }
+            datosExtraidos = datos;
+          // Escuchar el evento click del botón
+      document.getElementById('verificarBtn').addEventListener('click', async () => {
+                try {
+                const respuesta = await axios.post('/admin/verificar/datos/firmados', datosExtraidos, {
+
+                });
+
+                alert(respuesta.data.mensaje);
+            } catch (error) {
+                console.error(error);
+                alert('Error al verificar los datos.');
+            }
+      });
 
       } catch (error) {
         resultado.innerHTML = `<p class="text-red-500">Error al procesar la imagen: ${error}</p>`;

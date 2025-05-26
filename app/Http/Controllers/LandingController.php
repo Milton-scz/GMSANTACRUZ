@@ -5,18 +5,25 @@ namespace App\Http\Controllers;
 use App\Models\ActividadEconomica;
 use App\Models\Beneficiario;
 use App\Models\Certificado;
+use App\Models\File;
 use App\Models\Formulario;
 use App\Models\Landing;
 use App\Models\Solicitud;
-use Illuminate\Container\Attributes\Log;
+use App\Models\SolicitudFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-
+use App\Services\PinataService;
 class LandingController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+     protected $pinataService;
+       public function __construct(PinataService $pinataService)
+    {
+        $this->pinataService = $pinataService;
+    }
     public function index()
     {
         //
@@ -37,6 +44,7 @@ class LandingController extends Controller
      */
  public function store(Request $request)
 {
+    //dd($request->all());
     // Crear beneficiario
     $beneficiario = Beneficiario::create([
         'nombre' => $request->dto_nombres,
@@ -68,9 +76,44 @@ class LandingController extends Controller
         'estado' => 0,
     ]);
 
+           $camposArchivos = [
+            'cedula_anverso',
+            'cedula_reverso',
+            'file_nit',
+            'file_luz'
+        ];
+
+            foreach ($camposArchivos as $campo) {
+            Log::info("Revisando campo: $campo");
+
+            if ($request->hasFile($campo)) {
+                Log::info("Subiendo archivo: $campo");
+                $archivo = $request->file($campo);
+                try {
+                    $ipfsHash = $this->pinataService->uploadToIPFS($archivo);
+
+                    $fileRecord = File::create([
+                        'hash' => $ipfsHash
+                    ]);
+                    SolicitudFile::create([
+                        'solicitud_id' => $solicitud->id,
+                        'file_id' => $fileRecord->id
+                    ]);
+                    Log::info("Archivo $campo subido exitosamente con hash: $ipfsHash");
+
+                    $solicitud->files()->attach($fileRecord->id);
+
+                } catch (\Throwable $e) {
+                    Log::error("Error subiendo archivo $campo: " . $e->getMessage());
+                }
+            } else {
+                Log::warning("No se encontró archivo para: $campo");
+            }
+        }
     // Retornar con mensaje de éxito y el código de solicitud
-    return redirect()->route('landing.tipos-licencias')
-                     ->with('success', 'Solicitud creada exitosamente. Código de Seguimiento: ' . $solicitud->id);
+    return redirect('/')
+    ->with('success', 'Solicitud creada exitosamente. Código de Seguimiento: ' . $solicitud->id);
+
 }
 
 
@@ -119,6 +162,7 @@ class LandingController extends Controller
         'cedula' => $certificado->solicitud->beneficiario->cedula,
         'nit' => $certificado->solicitud->formulario->actividadEconomica->nit,
         'firma' => $certificado->firma,
+        'actividad' => $certificado->solicitud->formulario->actividadEconomica->actividad_economica,
         'id' => $certificado->id
     ];
 

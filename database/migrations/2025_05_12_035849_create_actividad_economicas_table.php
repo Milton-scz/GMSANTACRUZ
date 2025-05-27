@@ -17,6 +17,12 @@ return new class extends Migration
             $table->string('actividad_economica');
             $table->string('ubicacion');
             $table->string('nit');
+            $table->string('distrito');
+            $table->string('unidad_vecinal');
+            $table->string('manzano');
+            $table->string('lote');
+            $table->string('lat')->nullable();
+            $table->string('lng')->nullable();
            // $table->string('urlnit')->default('');
             $table->timestamps();
         });

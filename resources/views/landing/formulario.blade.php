@@ -126,7 +126,26 @@
                     <input type="text" id="rubro" name="rubro" placeholder="Rubro"  value={{$rubro}} readonly
                         class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
                 </div>
-
+<div>
+                        <label for="lote" class="block text-sm font-medium text-gray-700">Lote</label>
+                        <input type="text" id="lote" name="lote" placeholder="lote"
+                            class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
+                    </div>
+                     <div>
+                        <label for="manzano" class="block text-sm font-medium text-gray-700">Manzano</label>
+                        <input type="text" id="manzano" name="manzano" placeholder="manzano"
+                            class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
+                    </div>
+                     <div>
+                        <label for="unidad_vecinal" class="block text-sm font-medium text-gray-700">Unidad Vecinal</label>
+                        <input type="text" id="unidad_vecinal" name="unidad_vecinal" placeholder="unidad_vecinal"
+                            class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
+                    </div>
+                      <div>
+                        <label for="distrito" class="block text-sm font-medium text-gray-700">Distrito</label>
+                        <input type="text" id="distrito" name="distrito" placeholder="distrito"
+                            class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm" />
+                    </div>
                 <div class="md:col-span-2">
                     <label for="direccion_negocio" class="block text-sm font-medium text-gray-700">Dirección del Negocio</label>
                     <input type="text" id="direccion_negocio" name="direccion_negocio" placeholder="Dirección del negocio"

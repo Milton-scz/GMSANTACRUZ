@@ -11,6 +11,12 @@ class ActividadEconomica extends Model
         'actividad_economica',
         'ubicacion',
         'nit',
+        'distrito',
+        'unidad_vecinal',
+        'manzano',
+        'lote',
+        'lat',
+        'lng',
        // 'urlnit'
 
     ];

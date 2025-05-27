@@ -61,6 +61,12 @@ class SolicitudController extends Controller
             'actividad_economica' => $request->actividad,
             'ubicacion' => $request->direccion_negocio,
             'nit' => $request->nit,
+            'distrito' => $request->distrito,
+            'unidad_vecinal' => $request->unidad_vecinal,
+            'manzano' => $request->manzano,
+            'lote' => $request->lote,
+            'lat' => $request->lat,
+            'lng' => $request->lng,
         ]);
 
         $formulario = Formulario::create([

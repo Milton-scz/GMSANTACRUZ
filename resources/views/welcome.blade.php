@@ -356,7 +356,7 @@ function submitCodigo() {
                 </p>
             `;
         } else if (data.estado == "RECHAZADA") {
-            resultadoContenido.innerHTML = `<p class="text-danger">Su solicitud ha sido rechazada. Puede realizar nuevamente la solicitud.</p>`;
+            resultadoContenido.innerHTML = `<p class="text-danger">${data.mensaje} Puede realizar nuevamente la solicitud.</p>`;
 
          } else if (data.estado == "NO FOUND") {
             resultadoContenido.innerHTML = `<p class="text-danger">No se encontró la solicitud.</p>`;

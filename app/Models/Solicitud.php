@@ -37,5 +37,9 @@ public function files()
 {
     return $this->belongsToMany(File::class);
 }
+public function notificacion()
+{
+    return $this->hasOne(Notificacion::class);
+}
 
 }

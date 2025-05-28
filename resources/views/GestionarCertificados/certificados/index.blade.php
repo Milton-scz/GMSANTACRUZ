@@ -45,28 +45,29 @@
 
 
 
-               <td style="text-align: center;">
-                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-
-
-                             <a href="{{ route('admin.certificados.descargar', $certificado->solicitud->id) }}"
-                            class="btn-descargar-certificado"
-                            target="_blank" rel="noopener noreferrer">
-                                📄 Imprmir Certificado
+             <td style="text-align: center;">
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        @if($certificado->signed == 1)
+                            <a href="{{ route('admin.certificados.descargar', $certificado->solicitud->id) }}"
+                                class="btn-descargar-certificado"
+                                target="_blank" rel="noopener noreferrer">
+                                📄 Imprimir Certificado
                             </a>
+
                             <a href="{{ route('admin.certificados.ver', $certificado->solicitud->id) }}"
-                            target="_blank"
-                            class="btn-descargar-certificado">
-                            📄 Ver PDF Firmado
+                                target="_blank"
+                                class="btn-descargar-certificado">
+                                📄 Ver PDF Firmado
                             </a>
+                        @endif
 
-                            <button class="btn-firmar-certificado"
-                                    data-id="{{ $certificado->solicitud->id }}">
-                                ✍️ Firmar
-                            </button>
+                        <button class="btn-firmar-certificado"
+                                data-id="{{ $certificado->solicitud->id }}">
+                            ✍️ Firmar
+                        </button>
+                    </div>
+                </td>
 
-                        </div>
-                    </td>
 
 
                 </tr>

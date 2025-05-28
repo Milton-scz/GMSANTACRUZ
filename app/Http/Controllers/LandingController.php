@@ -134,10 +134,14 @@ class LandingController extends Controller
                 'estado' => 'NO FOUND'
             ], 404);
         }
+        // dd($solicitud);
 
         if ($solicitud->estado == 2) {
+
+            $mensaje = $solicitud->notificacion->mensaje;
             return response()->json([
                 'estado' => 'RECHAZADA',
+                'mensaje' => $mensaje
             ], 200);
         }
 

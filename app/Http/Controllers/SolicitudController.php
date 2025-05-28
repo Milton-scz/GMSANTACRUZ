@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-  use Illuminate\Support\Facades\Http;
+
+use Illuminate\Support\Facades\Http;
 use App\Models\ActividadEconomica;
 use App\Models\Beneficiario;
 use App\Models\Certificado;
 use App\Models\File;
 use App\Models\Formulario;
+use App\Models\Notificacion;
 use App\Models\Solicitud;
 use App\Models\SolicitudFile;
 use Illuminate\Support\Facades\Log;
@@ -22,8 +24,8 @@ class SolicitudController extends Controller
     /**
      * Display a listing of the resource.
      */
-     protected $pinataService;
-       public function __construct(PinataService $pinataService)
+    protected $pinataService;
+    public function __construct(PinataService $pinataService)
     {
         $this->pinataService = $pinataService;
     }
@@ -44,86 +46,85 @@ class SolicitudController extends Controller
     /**
      * Store a newly created resource in storage.
      */
- public function store(Request $request)
-{
-    try {
-        $beneficiario = Beneficiario::create([
-            'nombre' => $request->dto_nombres,
-            'cedula' => $request->dto_cedula,
-            'email' => $request->correo,
-            'celular' => $request->celular,
-            'direccion' => $request->direccion,
-            'tipo_persona' => $request->tipo_persona,
-        ]);
+    public function store(Request $request)
+    {
+        try {
+            $beneficiario = Beneficiario::create([
+                'nombre' => $request->dto_nombres,
+                'cedula' => $request->dto_cedula,
+                'email' => $request->correo,
+                'celular' => $request->celular,
+                'direccion' => $request->direccion,
+                'tipo_persona' => $request->tipo_persona,
+            ]);
 
-        $actividadEconomica = ActividadEconomica::create([
-            'rubro' => $request->rubro,
-            'actividad_economica' => $request->actividad,
-            'ubicacion' => $request->direccion_negocio,
-            'nit' => $request->nit,
-            'distrito' => $request->distrito,
-            'unidad_vecinal' => $request->unidad_vecinal,
-            'manzano' => $request->manzano,
-            'lote' => $request->lote,
-            'lat' => $request->lat,
-            'lng' => $request->lng,
-        ]);
+            $actividadEconomica = ActividadEconomica::create([
+                'rubro' => $request->rubro,
+                'actividad_economica' => $request->actividad,
+                'ubicacion' => $request->direccion_negocio,
+                'nit' => $request->nit,
+                'distrito' => $request->distrito,
+                'unidad_vecinal' => $request->unidad_vecinal,
+                'manzano' => $request->manzano,
+                'lote' => $request->lote,
+                'lat' => $request->lat,
+                'lng' => $request->lng,
+            ]);
 
-        $formulario = Formulario::create([
-            'beneficiario_id' => $beneficiario->id,
-            'actividad_economica_id' => $actividadEconomica->id,
-        ]);
+            $formulario = Formulario::create([
+                'beneficiario_id' => $beneficiario->id,
+                'actividad_economica_id' => $actividadEconomica->id,
+            ]);
 
-        $solicitud = Solicitud::create([
-            'formulario_id' => $formulario->id,
-            'beneficiario_id' => $beneficiario->id,
-            'estado' => 0,
-        ]);
+            $solicitud = Solicitud::create([
+                'formulario_id' => $formulario->id,
+                'beneficiario_id' => $beneficiario->id,
+                'estado' => 0,
+            ]);
 
-        $camposArchivos = [
-            'cedula_anverso',
-            'cedula_reverso',
-            'file_nit',
-            'file_luz'
-        ];
+            $camposArchivos = [
+                'cedula_anverso',
+                'cedula_reverso',
+                'file_nit',
+                'file_luz'
+            ];
 
             foreach ($camposArchivos as $campo) {
-            Log::info("Revisando campo: $campo");
+                Log::info("Revisando campo: $campo");
 
-            if ($request->hasFile($campo)) {
-                Log::info("Subiendo archivo: $campo");
-                $archivo = $request->file($campo);
-                try {
-                    $ipfsHash = $this->pinataService->uploadToIPFS($archivo);
+                if ($request->hasFile($campo)) {
+                    Log::info("Subiendo archivo: $campo");
+                    $archivo = $request->file($campo);
+                    try {
+                        $ipfsHash = $this->pinataService->uploadToIPFS($archivo);
 
-                    $fileRecord = File::create([
-                        'hash' => $ipfsHash
-                    ]);
-                    SolicitudFile::create([
-                        'solicitud_id' => $solicitud->id,
-                        'file_id' => $fileRecord->id
-                    ]);
-                    Log::info("Archivo $campo subido exitosamente con hash: $ipfsHash");
+                        $fileRecord = File::create([
+                            'hash' => $ipfsHash
+                        ]);
+                        SolicitudFile::create([
+                            'solicitud_id' => $solicitud->id,
+                            'file_id' => $fileRecord->id
+                        ]);
+                        Log::info("Archivo $campo subido exitosamente con hash: $ipfsHash");
 
-                    $solicitud->files()->attach($fileRecord->id);
-
-                } catch (\Throwable $e) {
-                    Log::error("Error subiendo archivo $campo: " . $e->getMessage());
+                        $solicitud->files()->attach($fileRecord->id);
+                    } catch (\Throwable $e) {
+                        Log::error("Error subiendo archivo $campo: " . $e->getMessage());
+                    }
+                } else {
+                    Log::warning("No se encontró archivo para: $campo");
                 }
-            } else {
-                Log::warning("No se encontró archivo para: $campo");
             }
+
+
+
+            return redirect()->route('admin.solicitudes')
+                ->with('success', 'Solicitud creada exitosamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Ocurrió un error al guardar la solicitud: ' . $e->getMessage());
         }
-
-
-
-        return redirect()->route('admin.solicitudes')
-                         ->with('success', 'Solicitud creada exitosamente.');
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return back()->with('error', 'Ocurrió un error al guardar la solicitud: ' . $e->getMessage());
     }
-}
 
 
     /**
@@ -138,10 +139,11 @@ class SolicitudController extends Controller
      * Show the form for editing the specified resource.
      */
 
-     public function edit($solicitud_id){
-       $solicitud = Solicitud::with('formulario.actividadEconomica')->findOrFail($solicitud_id);
+    public function edit($solicitud_id)
+    {
+        $solicitud = Solicitud::with('formulario.actividadEconomica')->findOrFail($solicitud_id);
 
-       // dd($solicitud->beneficiario->tipo_persona);
+        // dd($solicitud->beneficiario->tipo_persona);
         return view('GestionarCertificados.solicitudes.edit', compact('solicitud'));
     }
 
@@ -149,25 +151,62 @@ class SolicitudController extends Controller
     /**
      * Update the specified resource in storage.
      */
-  public function update(Request $request, $solicitud_id)
-{
-    $solicitud = Solicitud::findOrFail($solicitud_id);
+    public function update(Request $request, $solicitud_id)
+    {
+        $solicitud = Solicitud::findOrFail($solicitud_id);
+        $estado = $request->input('estado');
+        $solicitud->estado = $estado;
+        $solicitud->save();
 
-    $solicitud->estado = $request->input('estado');
-    // Actualiza otros campos si es necesario
+        // Lógica según el estado
+        if ($estado == 1) {
+            Certificado::create([
+                'solicitud_id' => $solicitud->id,
+                'signed' => 0,
+            ]);
 
-    $solicitud->save();
+            $mensaje = "Su solicitud ha sido aprobada. Por favor diríjase a la sección de búsqueda con su código {$solicitud->id} para descargar su certificado.";
+        } elseif ($estado == 2) {
+            $mensaje = $request->input('mensaje');
+        }
 
+        // Si el estado es 1 o 2, actualiza o crea notificación y envía WhatsApp
+        if (in_array($estado, [1, 2])) {
+            $notificacion = Notificacion::updateOrCreate(
+                ['solicitud_id' => $solicitud->id],
+                ['mensaje' => $mensaje]
+            );
+            $newMensaje = "Codigo de Solicitud: {$solicitud->id}\nEstado: " . ($estado == 1 ? 'Aprobada' : 'Rechazada') . "\nMensaje: {$mensaje}";
+            $this->enviarMensajeWhatsapp($solicitud->beneficiario->celular, $newMensaje);
+        }
 
-    // Verifica si el estado es 1 y envía la solicitud al endpoint externo
-if ($request->input('estado') == 1) {
-        Certificado::create([
-            'solicitud_id' => $solicitud->id,
-            'signed' => 0,
-        ]);
-}
-    return redirect()->route('admin.solicitudes')->with('success', 'Solicitud actualizada correctamente.');
-}
+        return redirect()->route('admin.solicitudes')->with('success', 'Solicitud actualizada correctamente.');
+    }
+
+    // Función auxiliar para enviar mensajes por WhatsApp
+    private function enviarMensajeWhatsapp($numero, $mensaje)
+    {
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('POST', 'https://waapi.app/api/v1/instances/70360/client/action/send-message', [
+                'body' => json_encode([
+                    'chatId' => '591' . $numero . '@c.us',
+                    'message' => $mensaje
+                ]),
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => 'Bearer CevSfvCD6aVpcde6dYSluLcsqCTlb6lNeSVfGFgR999b507f',
+                    'content-type' => 'application/json',
+                ],
+            ]);
+
+            Log::info('Mensaje WhatsApp enviado: ' . $response->getBody());
+        } catch (\Exception $e) {
+            Log::error('Error al enviar mensaje WhatsApp: ' . $e->getMessage());
+        }
+    }
+
 
 
     /**
@@ -178,10 +217,10 @@ if ($request->input('estado') == 1) {
         $solicitud->delete();
 
         return redirect()->route('solicitudes.index')
-                         ->with('success', 'Solicitud eliminada correctamente.');
+            ->with('success', 'Solicitud eliminada correctamente.');
     }
 
-     public function uploadFile(Request $request)
+    public function uploadFile(Request $request)
     {
         $validatedData = $request->validate([
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
@@ -201,5 +240,4 @@ if ($request->input('estado') == 1) {
             return response()->json(['error' => 'Error al subir el archivo: ' . $e->getMessage()], 500);
         }
     }
-
 }

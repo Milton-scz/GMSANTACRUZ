@@ -99,17 +99,22 @@
                     <div class="md:col-span-2">
                         <label for="estado" class="block text-sm font-medium text-gray-700">Estado de la Solicitud</label>
                         <select id="estado" name="estado" class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm">
-                            <option value="0" {{ $solicitud->estado == 'pendiente' ? 'selected' : '' }}>Pendiente</option>
-                            <option value="1" {{ $solicitud->estado == 'aprobada' ? 'selected' : '' }}>Aprobada</option>
-                            <option value="2" {{ $solicitud->estado == 'rechazada' ? 'selected' : '' }}>Rechazada</option>
+                            <option value="0" {{ $solicitud->estado == 0 ? 'selected' : '' }}>Pendiente</option>
+                            <option value="1" {{ $solicitud->estado == 1 ? 'selected' : '' }}>Aprobada</option>
+                            <option value="2" {{ $solicitud->estado == 2 ? 'selected' : '' }}>Rechazada</option>
                         </select>
+                          <div id="motivoRechazoContainer" class="md:col-span-2 mt-4 hidden">
+                            <label for="mensaje" class="block text-sm font-medium text-gray-700">Motivo del Rechazo</label>
+                            <textarea id="mensaje" name="mensaje" rows="3" class="mt-1 p-2 w-full border border-gray-300 rounded-md text-sm"></textarea>
+                        </div>
+
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Ubicación en el Mapa</label>
                         <div id="map"></div>
-                        <input type="hidden" id="lat" name="lat" value="{{ $solicitud->lat }}">
-                        <input type="hidden" id="lng" name="lng" value="{{ $solicitud->lng }}">
+                        <input type="hidden" id="lat" name="lat" value="{{ $solicitud->formulario->actividadEconomica->lat }}">
+                        <input type="hidden" id="lng" name="lng" value="{{ $solicitud->formulario->actividadEconomica->lng}}">
                     </div>
                 </div>
 
@@ -128,6 +133,23 @@
     <style>
         #map { height: 400px; width: 100%; }
     </style>
+<script>
+    const estadoSelect = document.getElementById('estado');
+    const motivoContainer = document.getElementById('motivoRechazoContainer');
+
+    function toggleMotivoRechazo() {
+        if (estadoSelect.value === '2') { // Rechazada
+            motivoContainer.classList.remove('hidden');
+        } else {
+            motivoContainer.classList.add('hidden');
+        }
+    }
+
+    estadoSelect.addEventListener('change', toggleMotivoRechazo);
+
+    // Ejecuta al cargar por si ya está seleccionada 'rechazada'
+    window.addEventListener('DOMContentLoaded', toggleMotivoRechazo);
+</script>
 
     <script>
         const step1 = document.getElementById('step1');

@@ -356,10 +356,12 @@ function submitCodigo() {
                 </p>
             `;
         } else if (data.estado == "RECHAZADA") {
-            resultadoContenido.innerHTML = `<p class="text-danger">${data.mensaje} Puede realizar nuevamente la solicitud.</p>`;
+            resultadoContenido.innerHTML = `<p class="text-danger">Motivo del rechazo: ${data.mensaje} <br>Puede realizar nuevamente la solicitud.</p>`;
 
          } else if (data.estado == "NO FOUND") {
             resultadoContenido.innerHTML = `<p class="text-danger">No se encontró la solicitud.</p>`;
+        }else if (data.estado == "NOT_SIGNED") {
+            resultadoContenido.innerHTML = `<p class="text-warning">${data.mensaje} .</p>`;
         }
         else {
             resultadoContenido.innerHTML = `<p class="text-info">Estado desconocido: ${data.estado}</p>`;

@@ -121,15 +121,13 @@
             <div>SECRETARÍA MUNICIPAL DE ADMINISTRACIÓN TRIBUTARIA</div>
             <div class="subtitulo">LICENCIA DE FUNCIONAMIENTO DE ACTIVIDAD ECONÓMICA</div>
         </div>
-
-        <div class="datos">
+    <div class="datos">
             <div class="fila"><span class="etiqueta">Razón Social:</span> {{ $data['nombre'] }}</div>
             <div class="fila"><span class="etiqueta">Propietario:</span> {{ $data['nombre'] }}</div>
             <div class="fila"><span class="etiqueta">NIT / CI:</span> {{ $data['nit'] }}</div>
             <div class="fila"><span class="etiqueta">Actividad:</span> {{ $data['actividad'] }}</div>
-            <div class="fila"><span class="etiqueta">Dirección:</span> Av. Los Ángeles C/ Tucanes Nro. 2020</div>
-            <div class="fila"><span class="etiqueta">Superficie:</span> 50.00 mts. cuadrados</div>
-            <div class="fila"><span class="etiqueta">Fecha de Inicio:</span> 10/06/2019</div>
+            <div class="fila"><span class="etiqueta">Dirección:</span>{{ $data['direccion'] }}</div>
+            <div class="fila"><span class="etiqueta">Fecha de Inicio:</span>{{ $data['fecha'] }}</div>
             <div class="fila"><span class="etiqueta">Licencia N°:</span> {{ $data['id'] }}</div>
         </div>
 
@@ -148,13 +146,11 @@
   class="qr"
 />
 
-        <div style="margin-top: 10px; font-size: 14px; font-weight: bold;">Firma Digital:</div>
+
        <div style="margin-top: 40px; border-top: 1px solid #1e6932; padding-top: 10px;">
-    <div style="font-weight: bold; color: #1e6932;">Firmado Digitalmente por:</div>
-    <div style="margin: 5px 0;">{{$data['nombre']}}</div>
-    <div style="font-size: 12px;">Fecha de firma: {{ date('d/m/Y H:i:s') }}</div>
+    <div style="font-size: 12px;">Fecha de firma: {{ $data['fecha'] }}</div>
+     <div style="margin-top: 10px; font-size: 14px; font-weight: bold;">Firma Digital:</div>
     <div style="font-size: 10px; margin-top: 5px;">
-        Firma digital electronica:<br>
         <code style="word-wrap: break-word; word-break: break-all;">
             {{ $data['firma']}}
         </code>

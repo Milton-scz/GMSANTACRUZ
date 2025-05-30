@@ -8,6 +8,7 @@ use App\Models\Certificado;
 use App\Models\File;
 use App\Models\Formulario;
 use App\Models\Landing;
+use App\Models\Notificacion;
 use App\Models\Solicitud;
 use App\Models\SolicitudFile;
 use Illuminate\Support\Facades\Log;
@@ -84,11 +85,16 @@ class LandingController extends Controller
         ]);
 
         $camposArchivos = [
-            'cedula_anverso',
-            'cedula_reverso',
-            'file_nit',
-            'file_luz'
-        ];
+                'cedula_anverso',
+                'cedula_reverso',
+                'file_nit',
+                'file_luz',
+                'declaracion_jurada',
+                'carta_compromiso',
+                'resolucion_sedes',
+                'titulo_provision_nacional'
+
+            ];
 
         foreach ($camposArchivos as $campo) {
             Log::info("Revisando campo: $campo");
@@ -116,6 +122,12 @@ class LandingController extends Controller
                 Log::warning("No se encontró archivo para: $campo");
             }
         }
+        $mensaje = "Su solicitud ha sido registrada exitosamente. El código de seguimiento es: " . $solicitud->id;
+                  $notificacion = Notificacion::create([
+                'solicitud_id' => $solicitud->id,
+                'mensaje' => $mensaje
+            ]);
+            $this->enviarMensajeWhatsapp($beneficiario->celular, $mensaje);
         // Retornar con mensaje de éxito y el código de solicitud
         return redirect('/')
             ->with('success', 'Solicitud creada exitosamente. Código de Seguimiento: ' . $solicitud->id);
@@ -146,13 +158,21 @@ class LandingController extends Controller
         }
 
         if ($solicitud->estado == 0) {
+              $mensaje = $solicitud->notificacion->mensaje;
             return response()->json([
                 'estado' => 'PENDIENTE',
+               'mensaje' => $mensaje
             ], 200);
         }
         $certificado = Certificado::where('solicitud_id', $codigo)->first();
 
 
+        if($solicitud->estado == 1 && $certificado->signed==0) {
+            return response()->json([
+                'estado' => 'NOT_SIGNED',
+                'mensaje' => 'Su solicitud ha sido aprobada, pero aún no se ha generado el certificado.'
+            ], 200);
+        }
         if ($certificado->signed == 1) {
             return response()->json([
                 'estado' => 'APROBADA',
@@ -171,7 +191,10 @@ class LandingController extends Controller
             'nit' => $certificado->solicitud->formulario->actividadEconomica->nit,
             'firma' => $certificado->firma,
             'actividad' => $certificado->solicitud->formulario->actividadEconomica->actividad_economica,
-            'id' => $certificado->id
+            'id' => $certificado->id,
+            'fecha' => $certificado->created_at->format('d/m/Y'),
+            'direccion' => $certificado->solicitud->formulario->actividadEconomica->ubicacion,
+
         ];
 
         return view('landing.certificado', compact('data'));
@@ -194,6 +217,29 @@ class LandingController extends Controller
             }
         } catch (\Exception $e) {
             return response()->json(['error' => 'Código inválido o corrupto.']);
+        }
+    }
+
+      private function enviarMensajeWhatsapp($numero, $mensaje)
+    {
+        $client = new \GuzzleHttp\Client();
+
+        try {
+            $response = $client->request('POST', 'https://waapi.app/api/v1/instances/70360/client/action/send-message', [
+                'body' => json_encode([
+                    'chatId' => '591' . $numero . '@c.us',
+                    'message' => $mensaje
+                ]),
+                'headers' => [
+                    'accept' => 'application/json',
+                    'authorization' => 'Bearer CevSfvCD6aVpcde6dYSluLcsqCTlb6lNeSVfGFgR999b507f',
+                    'content-type' => 'application/json',
+                ],
+            ]);
+
+            Log::info('Mensaje WhatsApp enviado: ' . $response->getBody());
+        } catch (\Exception $e) {
+            Log::error('Error al enviar mensaje WhatsApp: ' . $e->getMessage());
         }
     }
 }

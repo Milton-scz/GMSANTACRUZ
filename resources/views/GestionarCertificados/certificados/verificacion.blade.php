@@ -15,7 +15,7 @@
         </div>
 
         <button type="submit" class="next bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Subir
+          Extraer Datos
         </button>
       </fieldset>
     </form>
@@ -84,6 +84,7 @@
         });
 
         const texto = response.data.ParsedResults[0].ParsedText;
+        console.log(texto);
         const lineas = texto
           .split('\n')
           .map(l => l.replace(/\r/g, '').trim())
@@ -95,18 +96,16 @@
           'NIT / CI',
           'Actividad',
           'Dirección',
-          'Superficie',
           'Fecha de Inicio',
           'Licencia N°'
         ];
 
         // Detectar inicio de valores
-        const indiceValores = lineas.findIndex(linea =>
-          linea.toLowerCase().includes('raul') ||
-          /\d{5,}/.test(linea)
-        );
-
-        const valores = lineas.slice(indiceValores, indiceValores + claves.length);
+      const indiceValores = lineas.findIndex(linea =>
+  linea.toLowerCase().startsWith("licencia no")
+);
+console.log(indiceValores);
+        const valores = lineas.slice(indiceValores+1, indiceValores+ claves.length+1);
 
         const datos = {};
         for (let i = 0; i < claves.length; i++) {
@@ -126,7 +125,7 @@
       html += `
         <div class="mt-4">
           <button id="verificarBtn" class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Verificar Modificaciones
+            Verificar Validez de Datos
           </button>
         </div>
       `;

@@ -86,7 +86,12 @@ class SolicitudController extends Controller
                 'cedula_anverso',
                 'cedula_reverso',
                 'file_nit',
-                'file_luz'
+                'file_luz',
+                'declaracion_jurada',
+                'carta_compromiso',
+                'resolucion_sedes',
+                'titulo_provision_nacional'
+
             ];
 
             foreach ($camposArchivos as $campo) {
@@ -116,7 +121,12 @@ class SolicitudController extends Controller
                 }
             }
 
-
+$mensaje = "Su solicitud ha sido registrada exitosamente. Por favor diríjase a la sección de búsqueda con su código {$solicitud->id} para realizar el seguimiento.";
+            $notificacion = Notificacion::create([
+                'solicitud_id' => $solicitud->id,
+                'mensaje' => $mensaje
+            ]);
+            $this->enviarMensajeWhatsapp($beneficiario->celular, $mensaje);
 
             return redirect()->route('admin.solicitudes')
                 ->with('success', 'Solicitud creada exitosamente.');

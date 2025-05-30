@@ -158,14 +158,31 @@
                     <input type="hidden" id="lng" name="lng" />
                 </div>
             </div>
-            <div class="mb-4">
-                                    <label for="file_nit" class="block text-sm font-medium text-gray-700">Subir NIT</label>
-                                    <input type="file" id="file_nit" name="file_nit" class="mt-1 p-2 w-full border rounded-md" required>
-                            </div>
-                            <div class="mb-4">
-                                    <label for="file_luz" class="block text-sm font-medium text-gray-700">Subir Pre aviso de luz o Agua</label>
-                                    <input type="file" id="file_luz" name="file_luz" class="mt-1 p-2 w-full border rounded-md" required>
-                            </div>
+           <div class="mb-4">
+                        <label for="file_nit" class="block text-sm font-medium text-gray-700">Subir NIT</label>
+                        <input type="file" id="file_nit" name="file_nit" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="file_luz" class="block text-sm font-medium text-gray-700">Subir Pre aviso de luz o Agua</label>
+                        <input type="file" id="file_luz" name="file_luz" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="declaracion_jurada" class="block text-sm font-medium text-gray-700">Declaracion jurada formulario 101</label>
+                        <input type="file" id="declaracion_jurada" name="declaracion_jurada" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="carta_compromiso" class="block text-sm font-medium text-gray-700">Evaluacion de impacto ambiental o Carta de Compromiso</label>
+                        <input type="file" id="carta_compromiso" name="carta_compromiso" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                 <div class="mb-4">
+                        <label for="resolucion_sedes" class="block text-sm font-medium text-gray-700">Resolucion emitida por el SEDES-GOBERNACION</label>
+                        <input type="file" id="resolucion_sedes" name="resolucion_sedes" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+                    <div class="mb-4">
+                            <label for="titulo_provision_nacional" class="block text-sm font-medium text-gray-700">Titulo en provision nacional</label>
+                            <input type="file" id="titulo_provision_nacional" name="titulo_provision_nacional" class="mt-1 p-2 w-full border rounded-md" required>
+                </div>
+
             <div class="flex justify-between mt-6">
                 <button type="button" id="prev"
                     class="bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium px-4 py-2 rounded">

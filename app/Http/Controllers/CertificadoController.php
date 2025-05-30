@@ -150,9 +150,11 @@ class CertificadoController extends Controller
 
     $data = [
         'certificado_id' => $datos['Licencia N°'],
-        'razon_social' => $datos['Razón Social'],
+        'razon_social' =>$datos['Razón Social'],
         'nit' => $datos['NIT / CI'],
-        'actividad' => $datos['Actividad']
+        'actividad' => $datos['Actividad'],
+        'fecha' => $datos['Fecha de Inicio'],
+        'direccion' => $datos['Dirección']
     ];
 
 /*   $data = [
@@ -223,7 +225,9 @@ public function generarCertificado(Request $request)
         'nit' => $certificado->solicitud->formulario->actividadEconomica->nit,
         'actividad' => $certificado->solicitud->formulario->actividadEconomica->actividad_economica,
         'firma' => $certificado->firma,
-        'id' => $certificado->id
+        'id' => $certificado->id,
+        'fecha' => $certificado->created_at->format('d/m/Y'),
+        'direccion' => $certificado->solicitud->formulario->actividadEconomica->ubicacion
     ];
 
     Log::info('Datos del certificado', ['data' => $data]);
@@ -259,9 +263,11 @@ public function firmarPdf($certificado_id)
     // === DATOS A FIRMAR ===
     $data = [
         'certificado_id' => (string) $certificado->id,
-        'razon_social' => (string)$certificado->solicitud->beneficiario->nombre,
+        'razon_social' =>  (string)$certificado->solicitud->beneficiario->nombre,
         'nit' => (string) $certificado->solicitud->formulario->actividadEconomica->nit,
         'actividad' =>  (string)$certificado->solicitud->formulario->actividadEconomica->actividad_economica,
+        'fecha'=> (string) $certificado->created_at->format('d/m/Y'),
+        'direccion' => (string)$certificado->solicitud->formulario->actividadEconomica->ubicacion
     ];
 Log::info('Datos a firmar', ['data' => $data]);
 
@@ -321,9 +327,8 @@ Log::info('Datos a firmar', ['data' => $data]);
     $pdf->Cell(40, 7, 'Actividad:', 0);
     $pdf->MultiCell(80, 7, utf8_decode($data['actividad']), 0);
 
-    $pdf->Cell(40, 7, 'Superficie:', 0);
-    $pdf->Cell(80, 7, $certificado->superficie . ' mts. cuadrados', 0, 1);
-
+    $pdf->Cell(40, 7, 'Dirección:', 0);
+$pdf->Cell(80,7, ($data['direccion']), 0, 1);
     $pdf->Cell(40, 7, 'Fecha de Inicio:', 0);
     $pdf->Cell(80, 7, \Carbon\Carbon::parse($certificado->fecha_inicio)->format('d/m/Y'), 0, 1);
 

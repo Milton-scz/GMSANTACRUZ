@@ -35,8 +35,10 @@ class Solicitud extends Model
 
 public function files()
 {
-    return $this->belongsToMany(File::class);
+    return $this->belongsToMany(File::class, 'solicitud_files', 'solicitud_id', 'file_id');
 }
+
+
 public function notificacion()
 {
     return $this->hasOne(Notificacion::class);

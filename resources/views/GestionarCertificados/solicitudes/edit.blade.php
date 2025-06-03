@@ -109,6 +109,24 @@
                         </div>
 
                     </div>
+                    <!-- Ver Archivos Adjuntos -->
+                    <div class="md:col-span-2 mt-4">
+                        <label class="block text-sm font-medium text-gray-700">Archivos Adjuntos</label>
+
+                        @if($solicitud->files && $solicitud->files->count())
+                            <ul class="mt-2 list-disc list-inside text-sm text-gray-700 space-y-1">
+                                @foreach($solicitud->files as $file)
+                                    <li>
+                                        <a href="https://gateway.pinata.cloud/ipfs/{{ $file->hash }}" target="_blank" class="text-blue-600 hover:underline">
+                                            {{ $file->nombre ?? basename($file->hash) }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            <p class="text-sm text-gray-500 mt-2">No hay archivos adjuntos.</p>
+                        @endif
+                    </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Ubicación en el Mapa</label>

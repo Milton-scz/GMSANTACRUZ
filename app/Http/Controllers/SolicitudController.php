@@ -151,8 +151,8 @@ $mensaje = "Su solicitud ha sido registrada exitosamente. Por favor diríjase a 
 
     public function edit($solicitud_id)
     {
-        $solicitud = Solicitud::with('formulario.actividadEconomica')->findOrFail($solicitud_id);
-
+        $solicitud = Solicitud::with(['formulario.actividadEconomica', 'files'])->findOrFail($solicitud_id);
+//dd($solicitud);
         // dd($solicitud->beneficiario->tipo_persona);
         return view('GestionarCertificados.solicitudes.edit', compact('solicitud'));
     }

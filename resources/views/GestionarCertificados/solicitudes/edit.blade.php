@@ -110,23 +110,32 @@
 
                     </div>
                     <!-- Ver Archivos Adjuntos -->
-                    <div class="md:col-span-2 mt-4">
-                        <label class="block text-sm font-medium text-gray-700">Archivos Adjuntos</label>
+                   <div class="md:col-span-2 mt-4">
+    <label class="block text-sm font-medium text-gray-700">Archivos Adjuntos</label>
 
-                        @if($solicitud->files && $solicitud->files->count())
-                            <ul class="mt-2 list-disc list-inside text-sm text-gray-700 space-y-1">
-                                @foreach($solicitud->files as $file)
-                                    <li>
-                                        <a href="https://gateway.pinata.cloud/ipfs/{{ $file->hash }}" target="_blank" class="text-blue-600 hover:underline">
-                                            {{ $file->nombre ?? basename($file->hash) }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <p class="text-sm text-gray-500 mt-2">No hay archivos adjuntos.</p>
-                        @endif
-                    </div>
+    @if($solicitud->files && $solicitud->files->count())
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+            @foreach($solicitud->files as $file)
+                <div class="border rounded-md overflow-hidden shadow-sm w-full h-24 flex items-center justify-center">
+                    <a href="https://gateway.pinata.cloud/ipfs/{{ $file->hash }}" target="_blank" class="w-full h-full flex items-center justify-center">
+                        <img
+                            src="https://gateway.pinata.cloud/ipfs/{{ $file->hash }}"
+                            alt="{{ $file->nombre ?? 'Archivo IPFS' }}"
+                            class="object-cover w-20 h-20"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                        >
+                        <p class="hidden text-xs text-center text-gray-600 break-words px-1">
+                            {{ $file->nombre ?? basename($file->hash) }}
+                        </p>
+                    </a>
+                </div>
+            @endforeach
+        </div>
+    @else
+        <p class="text-sm text-gray-500 mt-2">No hay archivos adjuntos.</p>
+    @endif
+</div>
+
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700">Ubicación en el Mapa</label>
